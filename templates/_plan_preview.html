@@ -1,0 +1,39 @@
+{# Wireframe of the outline, painted with the borrowed palette (--mk-* vars).
+   Expects `plan`, plus `colors` and `options` from the including scope. #}
+{% import "_macros.html" as m %}
+<div class="mk wf" style="{{ m.mk_vars(colors, options) }}">
+  <header class="mk-nav">
+    <div class="mk-brand"><span class="mk-logo"></span> {{ plan.meta.name or "Your site" }}</div>
+    <nav class="mk-links">
+      {% for page in plan.pages if page.in_nav %}
+      <a class="mk-link {{ 'is-active' if loop.first }}">{{ page.title }}</a>
+      {% else %}
+      <span class="mk-link">no pages in nav</span>
+      {% endfor %}
+    </nav>
+    <div class="mk-nav-actions">
+      {% for l in plan.nav_links %}
+      <button class="mk-btn {{ 'mk-btn-primary' if loop.last }}">{{ l.label }}</button>
+      {% endfor %}
+    </div>
+  </header>
+
+  <div class="wf-pages">
+    {% for page in plan.pages %}
+    <section class="wf-page">
+      <div class="wf-page-head">
+        <span class="wf-page-name">{{ page.title }}</span>
+        {% if page.in_nav %}<span class="wf-tag">in nav</span>{% endif %}
+      </div>
+      {% for b in page.blocks %}
+      <div class="wf-block wf-{{ b.type }}">
+        <span class="wf-block-type">{{ BLOCK_META[b.type].label }}</span>
+        {% if b.note %}<span class="wf-block-note">{{ b.note }}</span>{% endif %}
+      </div>
+      {% else %}
+      <div class="wf-block wf-empty">— no content blocks —</div>
+      {% endfor %}
+    </section>
+    {% endfor %}
+  </div>
+</div>

@@ -1,0 +1,69 @@
+{% import "_macros.html" as m %}
+{% set theme = st.theme %}
+{% set hex = scheme[theme][t.key] %}
+{% set mv = color.model(hex) %}
+{% set bg = scheme[theme].background %}
+{% set expanded = t.key in st.expanded %}
+
+<div class="token-row {{ 'expanded' if expanded }}" id="row-{{ t.key }}">
+  <label class="token-swatch" style="background:{{ hex }}" title="Pick {{ t.label }}">
+    <input type="color" value="{{ hex }}" aria-label="{{ t.label }} color"
+           name="value" hx-post="/color" hx-vals='{"theme":"{{ theme }}","key":"{{ t.key }}"}'
+           hx-trigger="change" />
+  </label>
+
+  <div class="token-meta">
+    <div class="name">{{ t.label }}</div>
+    <div class="hint">{{ t.hint }}</div>
+  </div>
+
+  <div class="token-actions">
+    {{ m.contrast_pill(hex, bg) }}
+    <button class="icon-btn" type="button" title="Lighten"
+            hx-post="/nudge" hx-vals='{"theme":"{{ theme }}","key":"{{ t.key }}","dir":"up"}'>+</button>
+    <button class="icon-btn" type="button" title="Darken"
+            hx-post="/nudge" hx-vals='{"theme":"{{ theme }}","key":"{{ t.key }}","dir":"down"}'>&minus;</button>
+    <button class="icon-btn" type="button" title="Sliders"
+            hx-post="/expand" hx-vals='{"key":"{{ t.key }}"}'>{{ "▾" if expanded else "▸" }}</button>
+  </div>
+
+  <div class="token-inputs">
+    <input class="hex" name="value" value="{{ mv.hex }}" spellcheck="false" aria-label="{{ t.label }} hex"
+           hx-post="/color" hx-vals='{"theme":"{{ theme }}","key":"{{ t.key }}"}' hx-trigger="change" />
+    <input class="fmt" name="value" value="{{ mv.rgb_str }}" spellcheck="false" aria-label="rgb"
+           hx-post="/color" hx-vals='{"theme":"{{ theme }}","key":"{{ t.key }}"}' hx-trigger="change" />
+    <input class="fmt" name="value" value="{{ mv.hsl_str }}" spellcheck="false" aria-label="hsl"
+           hx-post="/color" hx-vals='{"theme":"{{ theme }}","key":"{{ t.key }}"}' hx-trigger="change" />
+    <input class="fmt" name="value" value="{{ mv.oklch_str }}" spellcheck="false" aria-label="oklch"
+           hx-post="/color" hx-vals='{"theme":"{{ theme }}","key":"{{ t.key }}"}' hx-trigger="change" />
+  </div>
+
+  {% if expanded %}
+  <div class="token-sliders">
+    <form class="hsl-group" hx-post="/hsl" hx-vals='{"theme":"{{ theme }}","key":"{{ t.key }}"}'
+          hx-trigger="change">
+      <div class="slider-line"><span>H</span>
+        <input type="range" name="h" min="0" max="360" step="1" value="{{ mv.hsl[0]|round(0, 'floor')|int }}" />
+        <span>{{ mv.hsl[0]|round(0)|int }}</span></div>
+      <div class="slider-line"><span>S</span>
+        <input type="range" name="s" min="0" max="100" step="1" value="{{ mv.hsl[1]|round(0)|int }}" />
+        <span>{{ mv.hsl[1]|round(0)|int }}</span></div>
+      <div class="slider-line"><span>L</span>
+        <input type="range" name="l" min="0" max="100" step="1" value="{{ mv.hsl[2]|round(0)|int }}" />
+        <span>{{ mv.hsl[2]|round(0)|int }}</span></div>
+    </form>
+    <form class="oklch-group" hx-post="/oklch" hx-vals='{"theme":"{{ theme }}","key":"{{ t.key }}"}'
+          hx-trigger="change">
+      <div class="slider-line"><span>𝑙</span>
+        <input type="range" name="l" min="0" max="1" step="0.005" value="{{ "%.3f"|format(mv.oklch[0]) }}" />
+        <span>{{ "%.2f"|format(mv.oklch[0]) }}</span></div>
+      <div class="slider-line"><span>𝑐</span>
+        <input type="range" name="c" min="0" max="0.37" step="0.005" value="{{ "%.3f"|format(mv.oklch[1]) }}" />
+        <span>{{ "%.3f"|format(mv.oklch[1]) }}</span></div>
+      <div class="slider-line"><span>𝘩</span>
+        <input type="range" name="h" min="0" max="360" step="1" value="{{ mv.oklch[2]|round(0)|int }}" />
+        <span>{{ mv.oklch[2]|round(0)|int }}</span></div>
+    </form>
+  </div>
+  {% endif %}
+</div>

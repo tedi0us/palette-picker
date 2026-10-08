@@ -1,0 +1,104 @@
+{% import "_macros.html" as m %}
+<div id="live">
+  <div class="preview-toolbar">
+    <div class="tabs">
+      {% for v, label in [("preview","Preview"),("contrast","Contrast"),("ramps","Tints & shades"),("export","Export")] %}
+      <button class="tab {{ 'active' if st.view == v }}" type="button"
+              hx-post="/view" hx-vals='{"name":"{{ v }}"}' hx-target="#live" hx-swap="outerHTML">{{ label }}</button>
+      {% endfor %}
+    </div>
+    <div class="spacer"></div>
+    <div class="seg">
+      {% for th, label in [("light","☀ Light"),("dark","☾ Dark")] %}
+      <button type="button" class="{{ 'active' if st.theme == th }}"
+              hx-post="/toggle" hx-vals='{"what":"theme","value":"{{ th }}"}'>{{ label }}</button>
+      {% endfor %}
+    </div>
+    <div class="seg">
+      {% for dv, label in [("desktop","🖥"),("tablet","▭"),("phone","▯")] %}
+      <button type="button" class="{{ 'active' if st.device == dv }}"
+              hx-post="/toggle" hx-vals='{"what":"device","value":"{{ dv }}"}'>{{ label }}</button>
+      {% endfor %}
+    </div>
+  </div>
+
+  {% set colors = scheme[st.theme] %}
+  {% if st.view == "preview" %}
+    <div class="device-frame" data-device="{{ st.device }}">
+      <div class="preview-scroll" style="background:{{ colors.background }}">
+        {% with colors=colors, options=scheme.options %}{% include "_preview.html" %}{% endwith %}
+      </div>
+    </div>
+
+  {% elif st.view == "contrast" %}
+    <div class="card">
+      <p class="hint">Rows are foreground colors, columns backgrounds. Ratio is WCAG 2.x —
+        green passes AA body text (4.5:1), yellow passes large/UI only (3:1), red fails.</p>
+      <div class="matrix-wrap">
+        <table class="matrix">
+          <thead><tr><th>fg \ bg</th>
+            {% for b in MATRIX_BG %}<th>{{ TOKEN_META[b].label }}</th>{% endfor %}
+          </tr></thead>
+          <tbody>
+          {% for fg in MATRIX_FG %}
+            <tr><th>{{ TOKEN_META[fg].label }}</th>
+            {% for b in MATRIX_BG %}
+              {% set g = color.wcag_grade(colors[fg], colors[b]) %}
+              <td class="{{ g.cls }}">
+                <div class="chip" style="color:{{ colors[fg] }};background:{{ colors[b] }}">Aa</div>
+                <div class="r">{{ "%.2f"|format(g.ratio) }}</div>
+                <div class="g">{{ g.tag }}</div>
+              </td>
+            {% endfor %}
+            </tr>
+          {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+  {% elif st.view == "ramps" %}
+    <div class="card">
+      <p class="hint">Perceptually-even 50–950 scales generated in OKLab from each brand/status
+        color. The outlined step matches your chosen value.</p>
+      <div class="ramp">
+        {% for key in RAMPED_TOKENS %}
+          {% set ramp = color.build_ramp(colors[key]) %}
+          <div class="ramp-row">
+            <div class="label">{{ TOKEN_META[key].label }}</div>
+            <div class="steps">
+              {% for step in RAMP_STEPS %}
+              <i class="{{ 'is-base' if ramp.base == step }}"
+                 style="background:{{ ramp[step] }};color:{{ color.readable_on(ramp[step]) }}"
+                 title="{{ key }}-{{ step }} · {{ ramp[step] }}">{{ step }}</i>
+              {% endfor %}
+            </div>
+          </div>
+        {% endfor %}
+      </div>
+    </div>
+
+  {% elif st.view == "export" %}
+    {% set code = exporters.render(st.fmt, scheme, st.ramp_scale) %}
+    <div class="card">
+      <div class="tabs">
+        {% for fid, spec in FORMATS.items() %}
+        <button class="tab {{ 'active' if st.fmt == fid }}" type="button"
+                hx-post="/export-opts" hx-vals='{"fmt":"{{ fid }}","ramp_scale":"{{ '1' if st.ramp_scale else '0' }}"}'
+                hx-target="#live" hx-swap="outerHTML">{{ spec.label }}</button>
+        {% endfor %}
+      </div>
+      <div class="btn-row" style="margin:8px 0">
+        <button class="btn btn-sm" type="button" data-copy="#code-out">📋 Copy</button>
+        <a class="btn btn-sm" href="/download?fmt={{ st.fmt }}">⬇ Download</a>
+        <label class="hint" style="display:flex;align-items:center;gap:6px;margin-left:8px">
+          <input type="checkbox" name="ramp_scale" value="1" {{ 'checked' if st.ramp_scale }}
+                 hx-post="/export-opts" hx-trigger="change" hx-target="#live" hx-swap="outerHTML"
+                 hx-vals='{"fmt":"{{ st.fmt }}"}' />
+          include tint/shade scales
+        </label>
+      </div>
+      <pre class="code" id="code-out">{{ code }}</pre>
+    </div>
+  {% endif %}
+</div>

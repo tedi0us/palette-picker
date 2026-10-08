@@ -1,0 +1,102 @@
+{% import "_macros.html" as m %}
+<div class="mk" style="{{ m.mk_vars(colors, options) }}">
+  <header class="mk-nav">
+    <div class="mk-brand"><span class="mk-logo"></span> Northwind</div>
+    <nav class="mk-links">
+      <a class="mk-link is-active">Product</a>
+      <a class="mk-link">Pricing</a>
+      <a class="mk-link">Docs</a>
+      <a class="mk-link">Blog</a>
+    </nav>
+    <div class="mk-nav-actions">
+      <button class="mk-btn mk-btn-ghost">Sign in</button>
+      <button class="mk-btn mk-btn-primary">Get started</button>
+    </div>
+  </header>
+
+  <section class="mk-hero">
+    <span class="mk-eyebrow">New · v2.4 released</span>
+    <h1>Ship your color decisions with confidence.</h1>
+    <p class="mk-lede">
+      Every button, badge, form field and alert below is painted with the exact
+      tokens you're choosing.
+    </p>
+    <div class="mk-hero-cta">
+      <button class="mk-btn mk-btn-primary mk-btn-lg">Start free trial</button>
+      <button class="mk-btn mk-btn-outline mk-btn-lg">Book a demo</button>
+    </div>
+    <div class="mk-trust"><span class="mk-dot mk-dot-success"></span> All systems operational</div>
+  </section>
+
+  <section class="mk-band">
+    <div class="mk-cards">
+      <article class="mk-card">
+        <span class="mk-chip mk-chip-primary">Fast</span>
+        <h3>Instant preview</h3>
+        <p>See changes reflected across a full page layout.</p>
+        <a class="mk-textlink">Learn more →</a>
+      </article>
+      <article class="mk-card">
+        <span class="mk-chip mk-chip-secondary">Accessible</span>
+        <h3>Contrast built in</h3>
+        <p>Every pairing is checked against WCAG AA and AAA.</p>
+        <a class="mk-textlink">Learn more →</a>
+      </article>
+      <article class="mk-card">
+        <span class="mk-chip mk-chip-accent">Portable</span>
+        <h3>Export anywhere</h3>
+        <p>CSS variables, Tailwind, SCSS, JSON and design tokens.</p>
+        <a class="mk-textlink">Learn more →</a>
+      </article>
+    </div>
+  </section>
+
+  <section class="mk-split">
+    <div class="mk-form">
+      <h3>Request access</h3>
+      <label>Full name<input type="text" placeholder="Ada Lovelace"></label>
+      <label>Work email<input type="email" placeholder="ada@example.com"></label>
+      <label>Company size
+        <select><option>1–10</option><option>11–50</option><option>51–200</option></select>
+      </label>
+      <label class="mk-check"><input type="checkbox" checked> Send me product updates</label>
+      <button class="mk-btn mk-btn-primary mk-btn-block">Submit request</button>
+      <p class="mk-form-note">We reply within one business day.</p>
+    </div>
+
+    <div class="mk-alerts">
+      <div class="mk-alert mk-alert-success"><b>Saved.</b> Your scheme was recorded.</div>
+      <div class="mk-alert mk-alert-info"><b>Heads up.</b> Dark mode uses a separate palette.</div>
+      <div class="mk-alert mk-alert-warning"><b>Low contrast.</b> Muted text on surface is 3.9:1.</div>
+      <div class="mk-alert mk-alert-danger"><b>Failed.</b> Could not reach the server.</div>
+
+      <table class="mk-table">
+        <thead><tr><th>Plan</th><th>Seats</th><th>Status</th></tr></thead>
+        <tbody>
+          <tr><td>Starter</td><td>3</td><td><span class="mk-badge mk-badge-success">Active</span></td></tr>
+          <tr><td>Team</td><td>12</td><td><span class="mk-badge mk-badge-warning">Trial</span></td></tr>
+          <tr><td>Enterprise</td><td>—</td><td><span class="mk-badge mk-badge-muted">Contact</span></td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section class="mk-buttons">
+    <h4>Buttons</h4>
+    <div class="mk-btn-row">
+      <button class="mk-btn mk-btn-primary">Primary</button>
+      <button class="mk-btn mk-btn-secondary">Secondary</button>
+      <button class="mk-btn mk-btn-accent">Accent</button>
+      <button class="mk-btn mk-btn-outline">Outline</button>
+      <button class="mk-btn mk-btn-ghost">Ghost</button>
+      <button class="mk-btn mk-btn-danger">Delete</button>
+      <button class="mk-btn mk-btn-primary" disabled>Disabled</button>
+    </div>
+  </section>
+
+  <footer class="mk-footer">
+    <div class="mk-brand"><span class="mk-logo"></span> Northwind</div>
+    <div class="mk-foot-links"><a class="mk-link">Privacy</a><a class="mk-link">Terms</a><a class="mk-link">Status</a></div>
+    <span class="mk-muted">© 2026 Northwind Inc.</span>
+  </footer>
+</div>

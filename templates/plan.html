@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+{% block title %}Site planner — Palette Picker{% endblock %}
+{% block body %}
+<div class="app">
+  <header class="topbar">
+    <h1><span class="logo-dot"></span> Site Planner</h1>
+    <span class="hint">outline the pages, top nav and content — no design yet</span>
+    <div class="spacer"></div>
+    <a class="btn btn-sm" href="/">← Color picker</a>
+    <a class="btn btn-sm" href="/admin">Submissions →</a>
+  </header>
+  {% include "_plan.html" %}
+</div>
+{% endblock %}

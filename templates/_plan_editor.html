@@ -1,0 +1,85 @@
+{# Sidebar: pages, their content blocks, extra nav buttons. #}
+
+<details class="group" open>
+  <summary>Pages &amp; content</summary>
+  <div class="group-body">
+    <p class="hint">★ marks a page shown in the top navigation. Reorder with ↑ ↓.</p>
+
+    {% for page in plan.pages %}
+    <div class="pg">
+      <div class="pg-head">
+        <button class="icon-btn" title="{{ 'Shown in top nav' if page.in_nav else 'Hidden from top nav' }}"
+                hx-post="/plan/pages" hx-vals='{"op":"nav","id":"{{ page.id }}"}'>{{ "★" if page.in_nav else "☆" }}</button>
+        <input class="pg-title" name="value" value="{{ page.title }}" aria-label="Page title"
+               hx-post="/plan/pages" hx-vals='{"op":"rename","id":"{{ page.id }}"}' hx-trigger="change" />
+        <button class="icon-btn" title="Move up" {{ 'disabled' if loop.first }}
+                hx-post="/plan/pages" hx-vals='{"op":"move","id":"{{ page.id }}","dir":"up"}'>↑</button>
+        <button class="icon-btn" title="Move down" {{ 'disabled' if loop.last }}
+                hx-post="/plan/pages" hx-vals='{"op":"move","id":"{{ page.id }}","dir":"down"}'>↓</button>
+        <button class="icon-btn" title="Delete page" {{ 'disabled' if plan.pages|length <= 1 }}
+                hx-post="/plan/pages" hx-vals='{"op":"remove","id":"{{ page.id }}"}'
+                hx-confirm="Delete “{{ page.title }}” and its blocks?">✕</button>
+      </div>
+
+      <div class="blk-list">
+        {% for b in page.blocks %}
+        <div class="blk">
+          <span class="blk-type" title="{{ BLOCK_META[b.type].hint }}">{{ BLOCK_META[b.type].label }}</span>
+          <input class="blk-note" name="value" value="{{ b.note }}"
+                 placeholder="{{ BLOCK_META[b.type].hint }}" aria-label="Block note"
+                 hx-post="/plan/blocks" hx-vals='{"op":"note","page":"{{ page.id }}","id":"{{ b.id }}"}' hx-trigger="change" />
+          <button class="icon-btn" title="Move up" {{ 'disabled' if loop.first }}
+                  hx-post="/plan/blocks" hx-vals='{"op":"move","page":"{{ page.id }}","id":"{{ b.id }}","dir":"up"}'>↑</button>
+          <button class="icon-btn" title="Move down" {{ 'disabled' if loop.last }}
+                  hx-post="/plan/blocks" hx-vals='{"op":"move","page":"{{ page.id }}","id":"{{ b.id }}","dir":"down"}'>↓</button>
+          <button class="icon-btn" title="Remove block"
+                  hx-post="/plan/blocks" hx-vals='{"op":"remove","page":"{{ page.id }}","id":"{{ b.id }}"}'>✕</button>
+        </div>
+        {% endfor %}
+        {% if not page.blocks %}<p class="hint blk-empty">No blocks yet — add one below.</p>{% endif %}
+      </div>
+
+      <div class="blk-add">
+        <select aria-label="Add a block" name="type"
+                hx-post="/plan/blocks" hx-trigger="change"
+                hx-vals='{"op":"add","page":"{{ page.id }}"}'
+                {{ 'disabled' if page.blocks|length >= siteplan.MAX_BLOCKS }}>
+          <option value="" selected>+ Add a block…</option>
+          {% for t in BLOCK_TYPES %}<option value="{{ t.id }}">{{ t.label }}</option>{% endfor %}
+        </select>
+      </div>
+    </div>
+    {% endfor %}
+
+    <button class="btn btn-sm" style="margin-top:10px"
+            hx-post="/plan/pages" hx-vals='{"op":"add"}'
+            {{ 'disabled' if plan.pages|length >= siteplan.MAX_PAGES }}>+ Add page</button>
+  </div>
+</details>
+
+<details class="group">
+  <summary>Extra nav buttons</summary>
+  <div class="group-body">
+    <p class="hint">Top-nav buttons that aren't full pages — “Book now”, “Login”, “Shop”.</p>
+    {% for l in plan.nav_links %}
+    <div class="blk">
+      <input class="blk-note" name="value" value="{{ l.label }}" aria-label="Nav button label"
+             hx-post="/plan/nav" hx-vals='{"op":"rename","id":"{{ l.id }}"}' hx-trigger="change" />
+      <button class="icon-btn" title="Remove"
+              hx-post="/plan/nav" hx-vals='{"op":"remove","id":"{{ l.id }}"}'>✕</button>
+    </div>
+    {% endfor %}
+    {% if not plan.nav_links %}<p class="hint">None.</p>{% endif %}
+    <button class="btn btn-sm" style="margin-top:8px"
+            hx-post="/plan/nav" hx-vals='{"op":"add","label":"New button"}'
+            {{ 'disabled' if plan.nav_links|length >= siteplan.MAX_NAV_LINKS }}>+ Add nav button</button>
+  </div>
+</details>
+
+<details class="group">
+  <summary>Danger zone</summary>
+  <div class="group-body">
+    <button class="btn btn-sm" hx-post="/plan/reset"
+            hx-confirm="Reset the whole outline to the starting template?">Reset outline</button>
+  </div>
+</details>

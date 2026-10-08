@@ -1,0 +1,25 @@
+{# Reusable macros #}
+
+{%- macro mk_vars(colors, options) -%}
+{%- set ns = namespace(out="") -%}
+{%- for key, hex in colors.items() -%}
+  {%- set ns.out = ns.out ~ "--mk-" ~ key|kebab ~ ":" ~ hex ~ ";--mk-" ~ key|kebab ~ "-on:" ~ color.readable_on(hex) ~ ";" -%}
+{%- endfor -%}
+{%- for key in RAMPED_TOKENS -%}
+  {%- if colors.get(key) -%}
+    {%- set ramp = color.build_ramp(colors[key]) -%}
+    {%- set ns.out = ns.out
+        ~ "--mk-" ~ key|kebab ~ "-hover:" ~ color.adjust_lightness(colors[key], -0.06) ~ ";"
+        ~ "--mk-" ~ key|kebab ~ "-soft:" ~ ramp[100] ~ ";"
+        ~ "--mk-" ~ key|kebab ~ "-softtext:" ~ ramp[900] ~ ";" -%}
+  {%- endif -%}
+{%- endfor -%}
+{%- set ns.out = ns.out ~ "--mk-radius:" ~ (options.radius|default(10)) ~ "px;--mk-font-scale:" ~ (options.font_scale|default(1)) ~ ";" -%}
+{{- ns.out -}}
+{%- endmacro -%}
+
+
+{%- macro contrast_pill(fg, bg, id="") -%}
+  {%- set g = color.wcag_grade(fg, bg) -%}
+  <span{% if id %} id="{{ id }}"{% endif %} class="contrast-pill {{ g.cls }}" title="Contrast vs background: {{ g.tag }}">{{ "%.2f"|format(g.ratio) }}</span>
+{%- endmacro -%}

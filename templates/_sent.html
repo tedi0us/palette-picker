@@ -1,0 +1,12 @@
+<div id="submit-modal">
+  <div class="modal-backdrop" onclick="if(event.target===this)ppCloseSubmit()">
+    <div class="modal">
+      <h2>Sent ✓</h2>
+      <p>Thanks{{ ", " ~ row.client if row.client }}. Your scheme
+        “<b>{{ row.scheme.meta.name }}</b>” was saved for the designer to review.</p>
+      <div class="modal-actions">
+        <button type="button" class="btn btn-primary" onclick="ppCloseSubmit()">Done</button>
+      </div>
+    </div>
+  </div>
+</div>

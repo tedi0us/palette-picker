@@ -1,0 +1,42 @@
+{% import "_macros.html" as m %}
+<div id="workspace" class="workspace" hx-target="#workspace" hx-swap="outerHTML">
+
+  <div class="subbar">
+    <input class="scheme-name" name="value" value="{{ scheme.meta.name }}"
+           placeholder="Scheme name" aria-label="Scheme name"
+           hx-post="/name" hx-trigger="change" />
+    <div class="btn-row">
+      <button class="btn btn-sm" hx-post="/undo" {{ 'disabled' if not store.can_undo(st) }}>↶ Undo</button>
+      <button class="btn btn-sm" hx-post="/redo" {{ 'disabled' if not store.can_redo(st) }}>↷ Redo</button>
+    </div>
+    <div class="spacer"></div>
+    <button class="btn btn-sm" hx-post="/share" hx-target="#share-slot" hx-swap="innerHTML">🔗 Copy link</button>
+    <button class="btn btn-primary btn-sm" type="button" onclick="ppOpenSubmit()">Send to designer →</button>
+    <span id="share-slot"></span>
+  </div>
+
+  <aside class="sidebar" id="sidebar">
+    {% include "_sidebar.html" %}
+  </aside>
+
+  <main class="main">
+    {% include "_live.html" %}
+  </main>
+
+  <div id="submit-modal" hidden>
+    <div class="modal-backdrop" onclick="if(event.target===this)ppCloseSubmit()">
+      <form class="modal" hx-post="/submit" hx-target="#submit-modal" hx-swap="outerHTML">
+        <h2>Send this scheme to the designer</h2>
+        <p class="hint">Saved on the local server so they can review your pick. Nothing leaves this network.</p>
+        <label>Your name / company</label>
+        <input name="client" placeholder="Acme Co." required />
+        <label>Notes (optional)</label>
+        <textarea name="notes" placeholder="We love the teal but the buttons feel too dark…"></textarea>
+        <div class="modal-actions">
+          <button type="button" class="btn" onclick="ppCloseSubmit()">Cancel</button>
+          <button type="submit" class="btn btn-primary">Send scheme</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,13 @@
+<div id="submit-modal">
+  <div class="modal-backdrop" onclick="if(event.target===this)ppCloseSubmit()">
+    <div class="modal">
+      <h2>Sent ✓</h2>
+      <p>Thanks{{ ", " ~ row.client if row.client }}. Your outline
+        “<b>{{ row.plan.meta.name }}</b>” — {{ row.plan.pages|length }}
+        page{{ "" if row.plan.pages|length == 1 else "s" }} — was saved for the designer to review.</p>
+      <div class="modal-actions">
+        <button type="button" class="btn btn-primary" onclick="ppCloseSubmit()">Done</button>
+      </div>
+    </div>
+  </div>
+</div>

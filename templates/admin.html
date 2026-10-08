@@ -1,0 +1,100 @@
+{% extends "base.html" %}
+{% import "_macros.html" as m %}
+{% block title %}Submissions — Palette Picker{% endblock %}
+{% block body %}
+<div class="admin-wrap">
+  <header class="topbar" style="border-radius:var(--ui-radius);margin-bottom:20px">
+    <h1><span class="logo-dot"></span> Submissions</h1>
+    <div class="spacer"></div>
+    <a class="btn btn-sm" href="/">← Back to picker</a>
+  </header>
+
+  {% if not rows and not plans %}
+    <p class="admin-empty">Nothing submitted yet. Share the picker link with your client.</p>
+  {% endif %}
+
+  {% if rows and plans %}<h2 class="admin-section">Color schemes</h2>{% endif %}
+
+  {% for row in rows %}
+  <div class="sub">
+    <div class="sub-head">
+      <span class="who">{{ row.client or "Anonymous" }}</span>
+      <span class="when">{{ row.created_at.replace("T"," ").rstrip("Z") }} UTC</span>
+      <span class="when">· “{{ row.scheme.meta.name }}”</span>
+      <span class="spacer"></span>
+      <button class="icon-btn" title="Delete"
+              hx-post="/admin/delete/{{ row.id }}" hx-target="closest .sub" hx-swap="outerHTML"
+              hx-confirm="Delete this submission?">✕</button>
+    </div>
+    <div class="sub-body">
+      <div>
+        <div class="swrap">
+          {% for k in ["primary","secondary","accent","background","surface","text","muted","border","success","warning","danger","info"] %}
+          {% if row.scheme.light.get(k) %}
+          <div class="sw"><i style="background:{{ row.scheme.light[k] }}"></i>{{ k }}
+            <span>{{ row.scheme.light[k] }}</span></div>
+          {% endif %}{% endfor %}
+        </div>
+        {% if row.notes %}<div class="notes">{{ row.notes }}</div>{% endif %}
+        <div class="when" style="margin-top:10px">{{ row.user_agent[:90] }}</div>
+      </div>
+      <div class="mini-preview" style="background:{{ row.scheme.light.background }}">
+        {% with colors=row.scheme.light, options=row.scheme.options %}
+          {% include "_preview.html" %}
+        {% endwith %}
+      </div>
+    </div>
+  </div>
+  {% endfor %}
+
+  {% if plans %}
+  <h2 class="admin-section">Site plans</h2>
+  {% for row in plans %}
+  <div class="sub">
+    <div class="sub-head">
+      <span class="who">{{ row.client or "Anonymous" }}</span>
+      <span class="when">{{ row.created_at.replace("T"," ").rstrip("Z") }} UTC</span>
+      <span class="when">· “{{ row.plan.meta.name }}” ·
+        {{ row.plan.pages|length }} page{{ "" if row.plan.pages|length == 1 else "s" }}</span>
+      {% if row.ref_name %}<span class="when">· colors: {{ row.ref_name }}</span>{% endif %}
+      <span class="spacer"></span>
+      <button class="icon-btn" title="Delete"
+              hx-post="/admin/plan/delete/{{ row.id }}" hx-target="closest .sub" hx-swap="outerHTML"
+              hx-confirm="Delete this site plan?">✕</button>
+    </div>
+    <div class="sub-body">
+      <div>
+        <div class="plan-outline">
+          <div class="po-nav">
+            <b>Top nav:</b>
+            {% for p in row.plan.pages if p.in_nav %}<span class="po-pill">{{ p.title }}</span>{% endfor %}
+            {% for l in row.plan.nav_links %}<span class="po-pill po-pill-btn">{{ l.label }}</span>{% endfor %}
+          </div>
+          {% for p in row.plan.pages %}
+          <div class="po-page">
+            <div class="po-page-name">{{ loop.index }}. {{ p.title }}{% if not p.in_nav %}
+              <span class="when">(not in nav)</span>{% endif %}</div>
+            <ul>
+              {% for b in p.blocks %}
+              <li><b>{{ BLOCK_META[b.type].label }}</b>{% if b.note %} — {{ b.note }}{% endif %}</li>
+              {% else %}
+              <li class="when">no blocks</li>
+              {% endfor %}
+            </ul>
+          </div>
+          {% endfor %}
+        </div>
+        {% if row.notes %}<div class="notes">{{ row.notes }}</div>{% endif %}
+        <div class="when" style="margin-top:10px">{{ row.user_agent[:90] }}</div>
+      </div>
+      <div class="mini-preview" style="background:{{ row.ref_scheme.light.background }}">
+        {% with colors=row.ref_scheme.light, options=row.ref_scheme.options, plan=row.plan %}
+          {% include "_plan_preview.html" %}
+        {% endwith %}
+      </div>
+    </div>
+  </div>
+  {% endfor %}
+  {% endif %}
+</div>
+{% endblock %}

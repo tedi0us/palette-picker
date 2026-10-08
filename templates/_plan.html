@@ -1,0 +1,60 @@
+{% import "_macros.html" as m %}
+<div id="planspace" class="workspace" hx-target="#planspace" hx-swap="outerHTML">
+
+  <div class="subbar">
+    <input class="scheme-name" name="name" value="{{ plan.meta.name }}"
+           placeholder="Outline name" aria-label="Outline name"
+           hx-post="/plan/meta" hx-trigger="change" />
+    <label class="ref-pick">
+      <span class="hint">Preview colors</span>
+      <select name="ref" class="ref-select" hx-post="/plan/meta" hx-trigger="change">
+        <option value="">Default palette</option>
+        {% for r in refs %}
+        <option value="{{ r.id }}" {{ 'selected' if plan.ref == r.id }}>
+          {{ r.scheme.meta.name }}{% if r.client %} — {{ r.client }}{% endif %}
+        </option>
+        {% endfor %}
+      </select>
+    </label>
+    <div class="spacer"></div>
+    <button class="btn btn-primary btn-sm" type="button" onclick="ppOpenSubmit()">Send to designer →</button>
+  </div>
+
+  <aside class="sidebar" id="sidebar">
+    {% include "_plan_editor.html" %}
+  </aside>
+
+  <main class="main">
+    <div class="preview-toolbar">
+      <div class="tabs"><span class="tab active">Wireframe preview</span></div>
+      <div class="spacer"></div>
+      <span class="hint">
+        {% if ref_label %}painted with “{{ ref_label }}”{% else %}painted with the default palette{% endif %}
+      </span>
+    </div>
+    <div class="device-frame" data-device="desktop">
+      <div class="preview-scroll" style="background:{{ ref_scheme.light.background }}">
+        {% with colors=ref_scheme.light, options=ref_scheme.options %}
+          {% include "_plan_preview.html" %}
+        {% endwith %}
+      </div>
+    </div>
+  </main>
+
+  <div id="submit-modal" hidden>
+    <div class="modal-backdrop" onclick="if(event.target===this)ppCloseSubmit()">
+      <form class="modal" hx-post="/plan/submit" hx-target="#submit-modal" hx-swap="outerHTML">
+        <h2>Send this outline to the designer</h2>
+        <p class="hint">Saved on the local server so they can review it. Nothing leaves this network.</p>
+        <label>Your name / company</label>
+        <input name="client" placeholder="Acme Co." required />
+        <label>Notes (optional)</label>
+        <textarea name="notes" placeholder="The shop page should come before About…"></textarea>
+        <div class="modal-actions">
+          <button type="button" class="btn" onclick="ppCloseSubmit()">Cancel</button>
+          <button type="submit" class="btn btn-primary">Send outline</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>

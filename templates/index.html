@@ -1,0 +1,13 @@
+{% extends "base.html" %}
+{% block body %}
+<div class="app">
+  <header class="topbar">
+    <h1><span class="logo-dot"></span> Palette Picker</h1>
+    <span class="hint">choose a scheme, preview it live, send it back</span>
+    <div class="spacer"></div>
+    <a class="btn btn-sm" href="/plan">Plan the site →</a>
+    <a class="btn btn-sm" href="/admin">Submissions →</a>
+  </header>
+  {% include "_workspace.html" %}
+</div>
+{% endblock %}

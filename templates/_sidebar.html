@@ -1,0 +1,74 @@
+{% import "_macros.html" as m %}
+
+<details class="group" open>
+  <summary>Starting points</summary>
+  <div class="group-body">
+    <div class="preset-grid">
+      {% for pid, p in PRESETS.items() %}
+      <button class="preset" type="button" title="{{ p.meta.description }}"
+              hx-post="/preset" hx-vals='{"id": "{{ pid }}"}'>
+        <span class="swatches">
+          {% for k in ["primary","secondary","accent","background","surface","text"] %}
+          <i style="background:{{ p.light[k] }}"></i>{% endfor %}
+        </span>
+        <span class="p-name">{{ p.meta.name }}</span>
+        <span class="p-tags">{{ p.meta.tags|join(" · ") }}</span>
+      </button>
+      {% endfor %}
+    </div>
+  </div>
+</details>
+
+<details class="group">
+  <summary>Auto-fill from a base color</summary>
+  <div class="group-body">
+    <p class="hint">Pick a base color and a harmony; primary, secondary &amp; accent are derived for the {{ st.theme }} theme.</p>
+    <form class="harmony-row" hx-post="/harmony" hx-trigger="submit">
+      <input type="color" name="base" value="{{ scheme[st.theme].primary }}" aria-label="Base color" />
+      <select name="type" aria-label="Harmony type">
+        {% for val, label in HARMONY_TYPES %}<option value="{{ val }}">{{ label }}</option>{% endfor %}
+      </select>
+      <button class="btn btn-sm" type="submit">Apply</button>
+    </form>
+  </div>
+</details>
+
+{% for grp in TOKEN_GROUPS %}
+<details class="group" open>
+  <summary>{{ grp.label }}</summary>
+  <div class="group-body">
+    {% for t in grp.tokens %}
+      {% include "_token_row.html" %}
+    {% endfor %}
+  </div>
+</details>
+{% endfor %}
+
+<details class="group">
+  <summary>Shape &amp; scale</summary>
+  <div class="group-body">
+    <div class="slider-line">
+      <span>R</span>
+      <input type="range" name="radius" min="0" max="24" step="1" value="{{ scheme.options.radius }}"
+             hx-post="/options" hx-trigger="change" />
+      <span>{{ scheme.options.radius }}px</span>
+    </div>
+    <div class="slider-line">
+      <span>A</span>
+      <input type="range" name="font_scale" min="0.9" max="1.15" step="0.01" value="{{ scheme.options.font_scale }}"
+             hx-post="/options" hx-trigger="change" />
+      <span>{{ "%.2f"|format(scheme.options.font_scale) }}</span>
+    </div>
+    <p class="hint">Border radius and font scale used by the preview.</p>
+  </div>
+</details>
+
+<details class="group">
+  <summary>Danger zone</summary>
+  <div class="group-body">
+    <div class="btn-row">
+      <button class="btn btn-sm" hx-post="/randomize">🎲 Randomize {{ st.theme }}</button>
+      <button class="btn btn-sm" hx-post="/reset">Reset to default</button>
+    </div>
+  </div>
+</details>
